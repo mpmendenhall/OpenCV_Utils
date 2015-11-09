@@ -7,6 +7,7 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <cassert>
+#include <iostream>
 
 using namespace cv;
 
@@ -18,10 +19,16 @@ void sumSubsample(const Mat_<T>& src, size_t nsamp, size_t nsum, size_t dx, size
     size_t ny = src.rows/(nsamp*nsum);
     dst = Mat_<float>(ny, nx);
     
-    for(size_t ix=0; ix<nx; ix++)
-        for(size_t iy = 0; iy<ny; iy++)
-            for(size_t iix = 0; iix < nsum; iix++)
-                for(size_t iiy = 0; iiy < nsum; iiy++)
-                    dst(iy, ix) += src(dy+(iy*nsum + iiy)*nsamp, dx+(ix*nsum + iix)*nsamp);
+    for(size_t ix=0; ix<nx; ix++) {
+        for(size_t iy = 0; iy<ny; iy++) {
+            for(size_t iix = 0; iix < nsum; iix++) {
+                for(size_t iiy = 0; iiy < nsum; iiy++) {
+                    double z = src(dy+(iy*nsum + iiy)*nsamp, dx+(ix*nsum + iix)*nsamp);
+                    dst(iy, ix) += z;
+                    //if(z > 12) std::cout << z << "\n";
+                }
+            }
+        }
+    }
     dst *= s/(nsum*nsum);
 }
