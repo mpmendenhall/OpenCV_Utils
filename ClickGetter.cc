@@ -12,9 +12,10 @@ ClickGetter::ClickGetter(): received(true) {
     accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN };
 }
 
-void ClickGetter::getClick() {
+ClickGetter::click ClickGetter::getClick() {
     received = false;
     while(!received) waitKey(10);
+    return clicks.back();
 }
 
 Mat ClickGetter::getSubregion(Mat& src, bool twoclick) {

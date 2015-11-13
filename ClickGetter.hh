@@ -17,16 +17,16 @@ public:
     /// Constructor
     ClickGetter();
     
-    /// wait until one more click received
-    void getClick();
-    /// select rectangular subregion of image
-    Mat getSubregion(Mat& src, bool twoclick = true);
-    
     /// click position information
     struct click {
         Point p;        ///< click position
         int evt;        ///< event type
     };
+    
+    /// wait until one more click received
+    click getClick();
+    /// select rectangular subregion of image
+    Mat getSubregion(Mat& src, bool twoclick = true);
     
     volatile bool received;     ///< flag for when event has been received
     vector<click> clicks;       ///< list of clicks received
