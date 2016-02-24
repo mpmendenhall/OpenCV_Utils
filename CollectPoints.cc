@@ -6,7 +6,7 @@
 // -- Michael P. Mendenhall, 2016
 
 #include "ClickGetter.hh"
-#include "Downsample.hh"
+#include "ZoomView.hh"
 
 #include <stdio.h>
 #include <iostream>
@@ -33,22 +33,17 @@ int main(int argc, char** argv) {
     
     string outnm = imname+"_points.txt";
     
-    // display window with mouse click tracking
-    const char* window_name = "OpenCV image";
-    namedWindow(window_name, CV_WINDOW_AUTOSIZE );
-    ClickGetter CG;
-    setMouseCallback(window_name, clickGetterCallback, &CG);
+    ZoomView ZV;
     
     // load image
     Mat src = imread(imname.c_str());
-    Mat dst;
-    resize(src, dst, Size(0,0), 0.25, 0.25, INTER_AREA);
+    ZV.setSource(src);
+    ZV.updateView();
     
     // Zoom in to ROI
     printf("Select ROI for points collection\n");
-    imshow(window_name, dst);
-    Mat roi = CG.getSubregion(src, 4.);
-    resize(roi, dst, Size(0,0), 0.5, 0.5, INTER_AREA);
+    ZV.zoomSelectedRegion();
+    ZV.updateView();
     
     // collect click points
     printf("Point selection commands:\n");
@@ -57,48 +52,47 @@ int main(int argc, char** argv) {
     printf("\t[Enter] to commit points to file and start new goup;\n");
     printf("\t[Esc] to save remaining points and exit.\n");
     FILE* fout = fopen(outnm.c_str(),"w");
-    imshow(window_name, dst);
     int gp = 0;
-    vector<Point> cpts;
-    CG.accept = { EVENT_LBUTTONUP, ClickGetter::EVENT_KEYBOARD };
+    vector< array<double,2> > cpts;
+    ZV.myCG.accept = { EVENT_LBUTTONUP, ClickGetter::EVENT_KEYBOARD };
     int pointmark_radius = 4;
     int pointmark_thick = 1;
     while(1) {
-        auto c = CG.getClick();
+        auto c = ZV.myCG.getClick();
         
         if(c.evt == ClickGetter::EVENT_KEYBOARD) {
             
             if(c.flags == 10) {
                 printf("Saving group %i with %zu points.\n", gp, cpts.size());
                 for(auto& p: cpts) {
-                    fprintf(fout, "%i\t%i\t%i\n", gp, p.x, p.y);
-                    circle(dst, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
+                    fprintf(fout, "%i\t%g\t%g\n", gp, p[0], p[1]);
+                    //circle(ZV.iview, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
                 }
                 cpts.clear();
                 gp++;
-                imshow(window_name, dst);
+                ZV.updateView();
             } else if(c.flags == 65288) {
                 if(cpts.size()) {
                     auto p = cpts.back();
-                    printf("Deleting point %i:\t%i\t%i\n", gp, p.x, p.y);
+                    printf("Deleting point %i:\t%g\t%g\n", gp, p[0], p[1]);
                     cpts.pop_back();
-                    circle(dst, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
-                    imshow(window_name, dst);
+                    //circle(ZV.iview, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
+                    ZV.updateView();
                 } else printf("No points left to delete.\n");
             } else if(c.flags == 27) break;
             else printf("Unknown key %i\n", c.flags);
             
         } else if(c.evt == EVENT_LBUTTONUP) {
-            
-            cpts.push_back(c.p);
-            printf("Adding point %i:\t%i\t%i\n", gp, c.p.x, c.p.y);
-            circle(dst, c.p, pointmark_radius, CV_RGB(0,255,0), pointmark_thick, CV_AA);
-            imshow(window_name, dst);
+            auto p = ZV.srcCoords(c.p);
+            cpts.push_back(p);
+            printf("Adding point %i:\t%g\t%g\n", gp, p[0], p[1]);
+            circle(ZV.iview, c.p, pointmark_radius, CV_RGB(0,255,0), pointmark_thick, CV_AA);
+            ZV.updateView();
             
         } else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
     }
     if(cpts.size()) printf("Saving group %i with %zu points.\n", gp, cpts.size());
-    for(auto& p: cpts) fprintf(fout, "%i\t%i\t%i\n", gp, p.x, p.y);
+    for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p[0], p[1]);
     printf("Done!\n");
     fclose(fout);
     

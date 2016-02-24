@@ -5,6 +5,9 @@
 // 
 // -- Michael P. Mendenhall, 2015
 
+#ifndef CLICKGETTER_HH
+#define CLICKGETTER_HH
+
 #include <vector>
 #include <set>
 #include <opencv2/highgui/highgui.hpp>
@@ -28,6 +31,8 @@ public:
     
     /// wait until one more click received
     click getClick();
+    /// get rectangular region
+    Rect getRectangle(bool twoclick = true);
     /// select rectangular subregion of image
     Mat getSubregion(Mat& src, double scale = 1, bool twoclick = true);
     
@@ -39,3 +44,5 @@ public:
 
 /// window callback for ClickGetter
 void clickGetterCallback(int event, int x, int y, int flags, void* params);
+
+#endif

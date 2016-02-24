@@ -31,13 +31,26 @@ ClickGetter::click ClickGetter::getClick() {
     return clicks.back();
 }
 
+Rect ClickGetter::getRectangle(bool twoclick) {
+    clicks.clear();
+    if(twoclick) accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN };
+    else accept = { EVENT_LBUTTONUP, EVENT_LBUTTONDOWN };
+    getClick();
+    getClick();
+    return Rect(clicks[0].p, clicks[1].p);
+}
+
 Mat ClickGetter::getSubregion(Mat& src, double scale, bool twoclick) {
     clicks.clear();
     if(twoclick) accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN };
     else accept = { EVENT_LBUTTONUP, EVENT_LBUTTONDOWN };
     getClick();
     getClick();
-    Rect rregion(clicks[0].p*scale, clicks[1].p*scale);
+    Rect rregion = getRectangle(twoclick);
+    rregion.x *= scale;
+    rregion.y *= scale;
+    rregion.width *= scale;
+    rregion.height *= scale;
     rregion &= Rect(0,0,src.cols,src.rows);
     //cout << clicks[0].p << "\t" << clicks[1].p << "\t" << rregion << "\n";
     return src(rregion);
