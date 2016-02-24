@@ -21,17 +21,21 @@ public:
     struct click {
         Point p;        ///< click position
         int evt;        ///< event type
+        int flags;      ///< event flags
     };
+    
+    static const int EVENT_KEYBOARD;    ///< flag for including keyboard events with mouse
     
     /// wait until one more click received
     click getClick();
     /// select rectangular subregion of image
-    Mat getSubregion(Mat& src, bool twoclick = true);
+    Mat getSubregion(Mat& src, double scale = 1, bool twoclick = true);
     
     volatile bool received;     ///< flag for when event has been received
+    Point mousepos;             ///< moving mouse position
     vector<click> clicks;       ///< list of clicks received
     set<int> accept;            ///< click types to accept
 };
 
 /// window callback for ClickGetter
-void clickGetterCallback(int event, int x, int y, int, void* params);
+void clickGetterCallback(int event, int x, int y, int flags, void* params);

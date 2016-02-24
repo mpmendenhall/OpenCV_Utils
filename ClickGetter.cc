@@ -8,36 +8,51 @@
 #include "ClickGetter.hh"
 #include <iostream>
 
+const int ClickGetter::EVENT_KEYBOARD = 999;
+
 ClickGetter::ClickGetter(): received(true) {
     accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN };
 }
 
 ClickGetter::click ClickGetter::getClick() {
     received = false;
-    while(!received) waitKey(10);
+    int k = -1;
+    while(!received) {
+        k = waitKey(10);
+        if(k != -1 && accept.count(EVENT_KEYBOARD)) {
+            received = true;
+            click c;
+            c.p = mousepos;
+            c.evt = EVENT_KEYBOARD;
+            c.flags = k;
+            clicks.push_back(c);
+        }
+    }
     return clicks.back();
 }
 
-Mat ClickGetter::getSubregion(Mat& src, bool twoclick) {
+Mat ClickGetter::getSubregion(Mat& src, double scale, bool twoclick) {
     clicks.clear();
     if(twoclick) accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN };
     else accept = { EVENT_LBUTTONUP, EVENT_LBUTTONDOWN };
     getClick();
     getClick();
-    Rect rregion(clicks[0].p, clicks[1].p);
+    Rect rregion(clicks[0].p*scale, clicks[1].p*scale);
     rregion &= Rect(0,0,src.cols,src.rows);
     //cout << clicks[0].p << "\t" << clicks[1].p << "\t" << rregion << "\n";
     return src(rregion);
 }
 
-void clickGetterCallback(int event, int x, int y, int, void* params) {
+void clickGetterCallback(int event, int x, int y, int flags, void* params) {
     assert(params);
     ClickGetter* CG = (ClickGetter*)params;
     if(CG->received) return;
+    if (event == EVENT_MOUSEMOVE) CG->mousepos = Point(x,y);
     if(CG->accept.count(event)) {
         ClickGetter::click c;
         c.p = Point(x,y);
         c.evt = event;
+        c.flags = flags;
         CG->clicks.push_back(c);
         CG->received = true;
     }
