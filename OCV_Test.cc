@@ -68,11 +68,14 @@ int main(int, char**) {
     // 4701:      +5m
     // 4709,10,12,13: +15m
     // 4715:      +115m
-    string basedir = "/home/mpmendenhall/Documents/FaNS/20151110_Scintillator_Bubbling/BubbleScans/";
-    string fLightDF = "IMG_4697.tiff";
-    string fLight = "IMG_4698.tiff";
-    string fSample = "IMG_4699.tiff";
-    string fSampleDF = "IMG_4700.tiff";
+    // 4746: after sitting overnight
+    // 4750: +day of bubbling
+    string basedir = "/Users/michael/Desktop/BubbleScans/";
+    //string basedir = "/home/mpmendenhall/Documents/FaNS/20151110_Scintillator_Bubbling/BubbleScans/";
+    string fLightDF = "IMG_4693.tiff";
+    string fLight = "IMG_4694.tiff";
+    string fSample = "IMG_4695.tiff";
+    string fSampleDF = "IMG_4696.tiff";
     
     // load sample image as greyscale
     Mat_<float> resamp = load_darkframed(basedir+fSample, basedir+fSampleDF);
@@ -106,7 +109,7 @@ int main(int, char**) {
     Rect wholeimg(0,0, resamp.cols, resamp.rows);
     Rect sumslice(0, c0.p.y-100*pixels_per_mm, resamp.cols, 100*pixels_per_mm);
     Rect whitebox(c0.p.x-28*pixels_per_mm, c0.p.y-100*pixels_per_mm, 24*pixels_per_mm, 100*pixels_per_mm);
-    Rect greybox(c0.p.x+35*pixels_per_mm, c0.p.y-100*pixels_per_mm, 70*pixels_per_mm, 100*pixels_per_mm);
+    Rect greybox(c0.p.x+30*pixels_per_mm, c0.p.y-100*pixels_per_mm, 60*pixels_per_mm, 100*pixels_per_mm);
     
     double whiteratio = mean(resamp(whitebox))[0];
     printf("Illumination ratio = %g\n", whiteratio);
