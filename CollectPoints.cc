@@ -22,26 +22,6 @@ using std::string;
 using namespace std;
 using namespace cv;
 
-/// test ClickGetter response
-void clicktest(const string& fname) {
-    
-    const char* window_name = "OpenCV image";
-    namedWindow(window_name, CV_WINDOW_AUTOSIZE );
-    ClickGetter CG;
-    CG.accept.insert(ClickGetter::EVENT_KEYBOARD);
-    setMouseCallback(window_name, clickGetterCallback, &CG);
-    
-    Mat src = imread(fname.c_str());
-    Mat dst;
-    resize(src, dst, Size(0,0), 0.25, 0.25, INTER_AREA);
-    imshow(window_name, dst);
-    
-    while(1) {
-        auto c = CG.getClick();
-        printf("click: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
-    }
-}
-
 int main(int argc, char** argv) {
     
     if(argc != 2) {
@@ -81,6 +61,8 @@ int main(int argc, char** argv) {
     int gp = 0;
     vector<Point> cpts;
     CG.accept = { EVENT_LBUTTONUP, ClickGetter::EVENT_KEYBOARD };
+    int pointmark_radius = 4;
+    int pointmark_thick = 1;
     while(1) {
         auto c = CG.getClick();
         
@@ -88,14 +70,20 @@ int main(int argc, char** argv) {
             
             if(c.flags == 10) {
                 printf("Saving group %i with %zu points.\n", gp, cpts.size());
-                for(auto& p: cpts) fprintf(fout, "%i\t%i\t%i\n", gp, p.x, p.y);
+                for(auto& p: cpts) {
+                    fprintf(fout, "%i\t%i\t%i\n", gp, p.x, p.y);
+                    circle(dst, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
+                }
                 cpts.clear();
                 gp++;
+                imshow(window_name, dst);
             } else if(c.flags == 65288) {
                 if(cpts.size()) {
                     auto p = cpts.back();
                     printf("Deleting point %i:\t%i\t%i\n", gp, p.x, p.y);
                     cpts.pop_back();
+                    circle(dst, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
+                    imshow(window_name, dst);
                 } else printf("No points left to delete.\n");
             } else if(c.flags == 27) break;
             else printf("Unknown key %i\n", c.flags);
@@ -104,6 +92,8 @@ int main(int argc, char** argv) {
             
             cpts.push_back(c.p);
             printf("Adding point %i:\t%i\t%i\n", gp, c.p.x, c.p.y);
+            circle(dst, c.p, pointmark_radius, CV_RGB(0,255,0), pointmark_thick, CV_AA);
+            imshow(window_name, dst);
             
         } else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
     }

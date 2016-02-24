@@ -6,4 +6,6 @@
 *.CR2
 *.tif
 *.tiff
+
 OCV_Test
+CollectPoints
