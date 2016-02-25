@@ -15,6 +15,12 @@ using std::array;
 using namespace std;
 using namespace cv;
 
+struct DPoint {
+    DPoint(double xx = 0, double yy = 0): x(xx), y(yy) { }
+    double x;
+    double y;
+};
+
 /// Interactive "zoomable" image viewport
 class ZoomView {
 public:
@@ -29,14 +35,16 @@ public:
     /// update display
     void updateView() { imshow(wname, iview); }
     
-    /// fit aspect ratio within maximum
+    /// fit aspect ratio within maximum; optionally, expand to include all
     Size fitAspect(Size s) const;
+    /// expand bounding box to fit window aspect ratio
+    void expandAspect(DPoint& p0, DPoint& p1) const;
     
     /// convert window coordinates to source image coordinates
-    array<double,2> srcCoords(Point p) const;
+    DPoint srcCoords(Point p) const;
     
     /// user input zoom rectangle selection
-    void zoomSelectedRegion();
+    void zoomSelectedRegion(bool fillAspect = true);
     
     const char* wname;  ///< name of window
     ClickGetter myCG;   ///< click handler for view window

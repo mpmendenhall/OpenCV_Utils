@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
     printf("\t[Esc] to save remaining points and exit.\n");
     FILE* fout = fopen(outnm.c_str(),"w");
     int gp = 0;
-    vector< array<double,2> > cpts;
+    vector<DPoint> cpts;
     ZV.myCG.accept = { EVENT_LBUTTONUP, ClickGetter::EVENT_KEYBOARD };
     int pointmark_radius = 4;
     int pointmark_thick = 1;
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
             if(c.flags == 10 || c.flags == 13) {
                 printf("Saving group %i with %zu points.\n", gp, cpts.size());
                 for(auto& p: cpts) {
-                    fprintf(fout, "%i\t%g\t%g\n", gp, p[0], p[1]);
+                    fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);
                     //circle(ZV.iview, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
                 }
                 cpts.clear();
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
             } else if(c.flags == 127 || c.flags == 65288) {
                 if(cpts.size()) {
                     auto p = cpts.back();
-                    printf("Deleting point %i:\t%g\t%g\n", gp, p[0], p[1]);
+                    printf("Deleting point %i:\t%g\t%g\n", gp, p.x, p.y);
                     cpts.pop_back();
                     //circle(ZV.iview, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
                     ZV.updateView();
@@ -85,14 +85,14 @@ int main(int argc, char** argv) {
         } else if(c.evt == EVENT_LBUTTONUP) {
             auto p = ZV.srcCoords(c.p);
             cpts.push_back(p);
-            printf("Adding point %i:\t%g\t%g\n", gp, p[0], p[1]);
+            printf("Adding point %i:\t%g\t%g\n", gp, p.x, p.y);
             circle(ZV.iview, c.p, pointmark_radius, CV_RGB(0,255,0), pointmark_thick, CV_AA);
             ZV.updateView();
             
         } else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
     }
     if(cpts.size()) printf("Saving group %i with %zu points.\n", gp, cpts.size());
-    for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p[0], p[1]);
+    for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);
     printf("Done!\n");
     fclose(fout);
     
