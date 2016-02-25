@@ -21,6 +21,7 @@ struct DPoint {
     double y;
 };
 
+
 /// Interactive "zoomable" image viewport
 class ZoomView {
 public:
@@ -34,6 +35,8 @@ public:
     
     /// update display
     void updateView() { imshow(wname, iview); }
+    /// refresh zoom image, clearing any over-drawing
+    void refresh() { setRegion(rregion); }
     
     /// fit aspect ratio within maximum; optionally, expand to include all
     static Size fitAspect(Size s, Size targ);
@@ -42,6 +45,8 @@ public:
     
     /// convert window coordinates to source image coordinates
     DPoint srcCoords(Point p) const;
+    /// Convert source coordinates to window pixels
+    Point viewCoords(DPoint p) const;
     
     /// zoom to region defined by current view pixel coordinates
     void zoomViewRegion(Rect ROI, bool fillAspect = true);

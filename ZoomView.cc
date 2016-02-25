@@ -55,6 +55,13 @@ DPoint ZoomView::srcCoords(Point p) const {
                   rregion.y + rregion.height*double(p.y)/targetSize.height);
 }
 
+
+
+Point ZoomView::viewCoords(DPoint p) const {
+    return Point(targetSize.width*(p.x - rregion.x)/rregion.width,
+                 targetSize.height*(p.y - rregion.y)/rregion.height);
+}
+
 void ZoomView::zoomViewRegion(Rect ROI, bool fillAspect) {
     auto a0 = srcCoords(ROI.tl());
     auto a1 = srcCoords(ROI.br());

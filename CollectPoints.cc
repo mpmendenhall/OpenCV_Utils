@@ -7,6 +7,7 @@
 
 #include "ClickGetter.hh"
 #include "ZoomView.hh"
+#include "MarkSet.hh"
 
 #include <stdio.h>
 #include <iostream>
@@ -21,7 +22,7 @@ using std::string;
 
 using namespace std;
 using namespace cv;
-
+    
 int main(int argc, char** argv) {
     
     if(argc != 2) {
@@ -51,10 +52,10 @@ int main(int argc, char** argv) {
     // collect click points
     FILE* fout = fopen(outnm.c_str(),"w");
     int gp = 0;
-    vector<DPoint> cpts;
+    vector<DPoint> cpts;                // points in current group
+    MarkSet MS;                         // image display annotations
+    
     ZV.myCG.accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN, EVENT_RBUTTONUP, ClickGetter::EVENT_KEYBOARD };
-    int pointmark_radius = 4;
-    int pointmark_thick = 1;
     ClickGetter::click prevdown; // previous mouse-down location
     while(1) {
         auto c = ZV.myCG.getClick();
@@ -63,6 +64,7 @@ int main(int argc, char** argv) {
         if(c.evt == EVENT_RBUTTONDOWN) { prevdown = c; continue; }
         if(c.evt == EVENT_RBUTTONUP && prevdown.evt == EVENT_RBUTTONDOWN) {
                 ZV.zoomViewRegion(Rect(c.p, prevdown.p));
+                MS.draw(ZV);
                 ZV.updateView();
         }
         prevdown = ClickGetter::click();
@@ -70,13 +72,15 @@ int main(int argc, char** argv) {
         if(c.evt == ClickGetter::EVENT_KEYBOARD) {
             
             if(c.flags == 10 || c.flags == 13) {
+                
                 printf("Saving group %i with %zu points.\n", gp, cpts.size());
-                for(auto& p: cpts) {
-                    fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);
-                    //circle(ZV.iview, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
-                }
-                cpts.clear();
+                for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);
                 gp++;
+                
+                for(auto m: MS.marks) m->setColor(CV_RGB(0,0,255));
+                cpts.clear();
+                ZV.refresh();
+                MS.draw(ZV);
                 ZV.updateView();
                 
             } else if(c.flags == 127 || c.flags == 65288) {
@@ -85,12 +89,15 @@ int main(int argc, char** argv) {
                     auto p = cpts.back();
                     printf("Deleting point %i:\t%g\t%g\n", gp, p.x, p.y);
                     cpts.pop_back();
-                    //circle(ZV.iview, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
+                    MS.popMark();
+                    ZV.refresh();
+                    MS.draw(ZV);
                     ZV.updateView();
                 } else printf("No points left to delete.\n");
                 
             } else if(c.flags == 117) {
                 ZV.unzoom();
+                MS.draw(ZV);
                 ZV.updateView();
             } else if(c.flags == 27) break;
             else printf("Unknown key %i\n", c.flags);
@@ -99,7 +106,7 @@ int main(int argc, char** argv) {
             auto p = ZV.srcCoords(c.p);
             cpts.push_back(p);
             printf("Adding point %i:\t%g\t%g\n", gp, p.x, p.y);
-            circle(ZV.iview, c.p, pointmark_radius, CV_RGB(0,255,0), pointmark_thick, CV_AA);
+            MS.addMark(new CircleMark(p,CV_RGB(0,255,0)), &ZV);
             ZV.updateView();
             
         } //else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
