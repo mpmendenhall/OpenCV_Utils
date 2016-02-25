@@ -55,21 +55,22 @@ int main(int argc, char** argv) {
     vector<DPoint> cpts;                // points in current group
     MarkSet MS;                         // image display annotations
     
-    ZV.myCG.accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN, EVENT_RBUTTONUP, ClickGetter::EVENT_KEYBOARD };
-    ClickGetter::click prevdown; // previous mouse-down location
+    ZV.myCG.accept = { EVENT_LBUTTONDOWN, EVENT_RBUTTONDOWN, EVENT_RBUTTONUP, ClickGetter::EVENT_KEYBOARD };
+    ClickGetter::click prevclick; // previous mouse-down location
     while(1) {
         auto c = ZV.myCG.getClick();
         
-        // look for right-button click & drag zoom
-        if(c.evt == EVENT_RBUTTONDOWN) { prevdown = c; continue; }
-        if(c.evt == EVENT_RBUTTONUP && prevdown.evt == EVENT_RBUTTONDOWN) {
-                ZV.zoomViewRegion(Rect(c.p, prevdown.p));
-                MS.draw(ZV);
-                ZV.updateView();
-        }
-        prevdown = ClickGetter::click();
-        
-        if(c.evt == ClickGetter::EVENT_KEYBOARD) {
+        if(c.evt == EVENT_RBUTTONUP && prevclick.evt == EVENT_RBUTTONDOWN) {
+            
+            ZV.zoomViewRegion(Rect(c.p, prevclick.p));
+            MS.draw(ZV);
+            ZV.updateView();
+            
+        } else if(c.evt == EVENT_RBUTTONDOWN) {
+            
+            // nothing done here; wait for up next time around
+            
+        } else if(c.evt == ClickGetter::EVENT_KEYBOARD) {
             
             if(c.flags == 10 || c.flags == 13) {
                 
@@ -102,14 +103,16 @@ int main(int argc, char** argv) {
             } else if(c.flags == 27) break;
             else printf("Unknown key %i\n", c.flags);
             
-        } else if(c.evt == EVENT_LBUTTONUP) {
+        } else if(c.evt == EVENT_LBUTTONDOWN) {
             auto p = ZV.srcCoords(c.p);
             cpts.push_back(p);
             printf("Adding point %i:\t%g\t%g\n", gp, p.x, p.y);
             MS.addMark(new CircleMark(p,CV_RGB(0,255,0)), &ZV);
             ZV.updateView();
             
-        } //else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
+        } else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
+        
+        prevclick = c;
     }
     if(cpts.size()) printf("Saving group %i with %zu points.\n", gp, cpts.size());
     for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);

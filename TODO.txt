@@ -1,0 +1,26 @@
+Features TODO
+
+--- UI ---
+
+Scrollwheel zoom
+Filter stack interface
+Mark lines, curves
+Select, move handles
+    "Live" overdrawing
+
+Instant measurement coordinates
+    perspective correction solver
+
+--- Core ---
+
+Filter stacks mechanism
+Filters
+    - Color projection
+    - Histogram equalization, distortion
+    - Edgefinder / derivative
+    - perspective correction
+    - lens distortion correction
+Precision feature locators
+    - spot finder
+    - edge finder along guide
+    - image match alignment, with/without rotation
