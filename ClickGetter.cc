@@ -33,10 +33,12 @@ ClickGetter::click ClickGetter::getClick() {
 
 Rect ClickGetter::getRectangle(bool twoclick) {
     clicks.clear();
+    auto oldaccept = accept;
     if(twoclick) accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN };
     else accept = { EVENT_LBUTTONUP, EVENT_LBUTTONDOWN };
     getClick();
     getClick();
+    accept = oldaccept;
     return Rect(clicks[0].p, clicks[1].p);
 }
 

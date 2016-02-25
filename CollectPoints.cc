@@ -29,28 +29,26 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
     string imname = argv[1];
-    //clicktest(imname);
     
     string outnm = imname+"_points.txt";
     
-    ZoomView ZV;
-    
-    // load image
+    // load, display image
     Mat src = imread(imname.c_str());
+    ZoomView ZV;
     ZV.setSource(src);
     ZV.updateView();
     
-    // Zoom in to ROI
-    printf("Select ROI for points collection\n");
-    ZV.zoomSelectedRegion();
-    ZV.updateView();
-    
-    // collect click points
+    // show instructions
     printf("Point selection commands:\n");
     printf("\tLeft-click to add new point;\n");
     printf("\t[Backspace] to remove previous point;\n");
     printf("\t[Enter] to commit points to file and start new goup;\n");
     printf("\t[Esc] to save remaining points and exit.\n");
+    printf("\t[z] to zoom in to selected region.\n");
+    printf("\t[u] to unzoom to whole image.\n");
+    
+    ///////////////////////
+    // collect click points
     FILE* fout = fopen(outnm.c_str(),"w");
     int gp = 0;
     vector<DPoint> cpts;
@@ -71,7 +69,9 @@ int main(int argc, char** argv) {
                 cpts.clear();
                 gp++;
                 ZV.updateView();
+                
             } else if(c.flags == 127 || c.flags == 65288) {
+                
                 if(cpts.size()) {
                     auto p = cpts.back();
                     printf("Deleting point %i:\t%g\t%g\n", gp, p.x, p.y);
@@ -79,6 +79,13 @@ int main(int argc, char** argv) {
                     //circle(ZV.iview, p, pointmark_radius, CV_RGB(100,100,100), pointmark_thick, CV_AA);
                     ZV.updateView();
                 } else printf("No points left to delete.\n");
+                
+            } else if(c.flags == 122) {
+                ZV.zoomSelectedRegion();
+                ZV.updateView();
+            } else if(c.flags == 117) {
+                ZV.unzoom();
+                ZV.updateView();
             } else if(c.flags == 27) break;
             else printf("Unknown key %i\n", c.flags);
             

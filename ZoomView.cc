@@ -11,14 +11,14 @@
 ZoomView::ZoomView(const char* window_name): wname(window_name) { 
     namedWindow(wname, WINDOW_AUTOSIZE | CV_WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
     setMouseCallback(wname, clickGetterCallback, &myCG);
-    maxSize = targetSize = Size(1200,800);
+    _maxSize = maxSize = targetSize = Size(1200,800);
     resizeWindow(wname, targetSize.width, targetSize.height);
 }
 
-Size ZoomView::fitAspect(Size s) const {
-    if(s.width*maxSize.height < s.height*maxSize.width)
-        return Size((s.width*maxSize.height)/s.height, maxSize.height);
-    else return Size(maxSize.width, (maxSize.width*s.height)/s.width);
+Size ZoomView::fitAspect(Size s, Size targ) {
+    if(s.width*targ.height < s.height*targ.width)
+        return Size((s.width*targ.height)/s.height, targ.height);
+    else return Size(targ.width, (targ.width*s.height)/s.width);
 }
 
 void ZoomView::expandAspect(DPoint& p0, DPoint& p1) const {
@@ -39,13 +39,14 @@ void ZoomView::expandAspect(DPoint& p0, DPoint& p1) const {
 
 void ZoomView::setSource(Mat s) {
     src = s;
+    maxSize = fitAspect(src.size(), _maxSize);
     setRegion(Rect(0,0,src.cols,src.rows));
 }
 
 void ZoomView::setRegion(Rect r) {
     rregion = r;
-    rregion &= Rect(0,0,src.cols,src.rows);
-    targetSize = fitAspect(rregion.size());
+    rregion &= Rect(0,0,src.cols,src.rows); // necessary to avoid crash from out-of-image points
+    targetSize = fitAspect(rregion.size(), maxSize);
     resize(src(rregion), iview, targetSize, 0, 0, INTER_AREA);
 }
 
@@ -55,9 +56,16 @@ DPoint ZoomView::srcCoords(Point p) const {
 }
 
 void ZoomView::zoomSelectedRegion(bool fillAspect) {
+    printf("Click two points to select zoom region...\n");
     Rect ROI = myCG.getRectangle();
     auto a0 = srcCoords(ROI.tl());
     auto a1 = srcCoords(ROI.br());
     if(fillAspect) expandAspect(a0,a1);
-    setRegion(Rect(Point(a0.x,a0.y), Point(a1.x,a1.y)));
+    Rect R(Point(a0.x,a0.y), Point(a1.x,a1.y));
+    if(R.area() <= 0) {
+        printf("\tNot zooming to zero-sized region.\n");
+    } else {
+        printf("\tZOOOM!\n");
+        setRegion(R);
+    }
 }

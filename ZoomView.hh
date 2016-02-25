@@ -36,7 +36,7 @@ public:
     void updateView() { imshow(wname, iview); }
     
     /// fit aspect ratio within maximum; optionally, expand to include all
-    Size fitAspect(Size s) const;
+    static Size fitAspect(Size s, Size targ);
     /// expand bounding box to fit window aspect ratio
     void expandAspect(DPoint& p0, DPoint& p1) const;
     
@@ -45,12 +45,15 @@ public:
     
     /// user input zoom rectangle selection
     void zoomSelectedRegion(bool fillAspect = true);
+    /// reset to full-image view
+    void unzoom() { setSource(src); }
     
     const char* wname;  ///< name of window
     ClickGetter myCG;   ///< click handler for view window
     Mat src;            ///< underlying full-scale image
     Mat iview;          ///< scaled view version
     Size maxSize;       ///< view window maximum dimensions
+    Size _maxSize;      ///< full maximum dimensions for any image
     Size targetSize;    ///< view window dimensions
     Rect rregion;       ///< view region of source image
 };
