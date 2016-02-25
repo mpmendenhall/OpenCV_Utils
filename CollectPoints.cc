@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
         
         if(c.evt == ClickGetter::EVENT_KEYBOARD) {
             
-            if(c.flags == 10) {
+            if(c.flags == 10 || c.flags == 13) {
                 printf("Saving group %i with %zu points.\n", gp, cpts.size());
                 for(auto& p: cpts) {
                     fprintf(fout, "%i\t%g\t%g\n", gp, p[0], p[1]);
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
                 cpts.clear();
                 gp++;
                 ZV.updateView();
-            } else if(c.flags == 65288) {
+            } else if(c.flags == 127 || c.flags == 65288) {
                 if(cpts.size()) {
                     auto p = cpts.back();
                     printf("Deleting point %i:\t%g\t%g\n", gp, p[0], p[1]);
