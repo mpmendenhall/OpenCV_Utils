@@ -43,6 +43,8 @@ public:
     /// convert window coordinates to source image coordinates
     DPoint srcCoords(Point p) const;
     
+    /// zoom to region defined by current view pixel coordinates
+    void zoomViewRegion(Rect ROI, bool fillAspect = true);
     /// user input zoom rectangle selection
     void zoomSelectedRegion(bool fillAspect = true);
     /// reset to full-image view

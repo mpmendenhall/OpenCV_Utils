@@ -41,22 +41,31 @@ int main(int argc, char** argv) {
     // show instructions
     printf("Point selection commands:\n");
     printf("\tLeft-click to add new point;\n");
+    printf("\tRight-click-and-drag to zoom in to selected region.\n");
+    printf("\t[u] to unzoom to whole image.\n");
     printf("\t[Backspace] to remove previous point;\n");
     printf("\t[Enter] to commit points to file and start new goup;\n");
     printf("\t[Esc] to save remaining points and exit.\n");
-    printf("\t[z] to zoom in to selected region.\n");
-    printf("\t[u] to unzoom to whole image.\n");
     
     ///////////////////////
     // collect click points
     FILE* fout = fopen(outnm.c_str(),"w");
     int gp = 0;
     vector<DPoint> cpts;
-    ZV.myCG.accept = { EVENT_LBUTTONUP, ClickGetter::EVENT_KEYBOARD };
+    ZV.myCG.accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN, EVENT_RBUTTONUP, ClickGetter::EVENT_KEYBOARD };
     int pointmark_radius = 4;
     int pointmark_thick = 1;
+    ClickGetter::click prevdown; // previous mouse-down location
     while(1) {
         auto c = ZV.myCG.getClick();
+        
+        // look for right-button click & drag zoom
+        if(c.evt == EVENT_RBUTTONDOWN) { prevdown = c; continue; }
+        if(c.evt == EVENT_RBUTTONUP && prevdown.evt == EVENT_RBUTTONDOWN) {
+                ZV.zoomViewRegion(Rect(c.p, prevdown.p));
+                ZV.updateView();
+        }
+        prevdown = ClickGetter::click();
         
         if(c.evt == ClickGetter::EVENT_KEYBOARD) {
             
@@ -80,9 +89,6 @@ int main(int argc, char** argv) {
                     ZV.updateView();
                 } else printf("No points left to delete.\n");
                 
-            } else if(c.flags == 122) {
-                ZV.zoomSelectedRegion();
-                ZV.updateView();
             } else if(c.flags == 117) {
                 ZV.unzoom();
                 ZV.updateView();
@@ -96,7 +102,7 @@ int main(int argc, char** argv) {
             circle(ZV.iview, c.p, pointmark_radius, CV_RGB(0,255,0), pointmark_thick, CV_AA);
             ZV.updateView();
             
-        } else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
+        } //else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
     }
     if(cpts.size()) printf("Saving group %i with %zu points.\n", gp, cpts.size());
     for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);

@@ -23,8 +23,8 @@ public:
     /// click position information
     struct click {
         Point p;        ///< click position
-        int evt;        ///< event type
-        int flags;      ///< event flags
+        int evt = 0;    ///< event type
+        int flags = 0;  ///< event flags
     };
     
     static const int EVENT_KEYBOARD;    ///< flag for including keyboard events with mouse

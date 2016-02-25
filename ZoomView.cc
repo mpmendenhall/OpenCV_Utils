@@ -55,9 +55,7 @@ DPoint ZoomView::srcCoords(Point p) const {
                   rregion.y + rregion.height*double(p.y)/targetSize.height);
 }
 
-void ZoomView::zoomSelectedRegion(bool fillAspect) {
-    printf("Click two points to select zoom region...\n");
-    Rect ROI = myCG.getRectangle();
+void ZoomView::zoomViewRegion(Rect ROI, bool fillAspect) {
     auto a0 = srcCoords(ROI.tl());
     auto a1 = srcCoords(ROI.br());
     if(fillAspect) expandAspect(a0,a1);
@@ -68,4 +66,9 @@ void ZoomView::zoomSelectedRegion(bool fillAspect) {
         printf("\tZOOOM!\n");
         setRegion(R);
     }
+}
+
+void ZoomView::zoomSelectedRegion(bool fillAspect) {
+    printf("Click two points to select zoom region...\n");
+    zoomViewRegion(myCG.getRectangle(), fillAspect);
 }
