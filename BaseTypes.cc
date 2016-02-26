@@ -49,3 +49,11 @@ DRect boundingRect(const vector<DPoint>& v) {
     }
     return DRect(p0,p1);
 }
+
+vector<DPoint> corners(DRect R) {
+    DPoint c0 = R.tl();
+    DPoint c1 = R.br();
+    DPoint c2 = DPoint(c0.x,c1.y);
+    DPoint c3 = DPoint(c1.x,c0.y);
+    return { c0, c3, c1, c2 };
+}

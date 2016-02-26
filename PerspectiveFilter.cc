@@ -13,7 +13,7 @@ PerspectiveFilter::PerspectiveFilter() {
 }
 
 void PerspectiveFilter::apply(const Mat& src) {
-    warpPerspective(src, dst, M1, dstSize);
+    warpPerspective(src, dst, M1, dstSize, INTER_CUBIC);
 }
 
 DPoint perspectivetx(DPoint p, const Mat& M) {

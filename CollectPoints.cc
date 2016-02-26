@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
             
         } else if(c.evt == ClickGetter::EVENT_KEYBOARD) {
             
-            if(c.flags == 10 || c.flags == 13) {
+            if(c.flags == 10 || c.flags == 13) { // [enter]
                 
                 printf("Saving group %i with %zu points.\n", gp, cpts.size());
                 for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
                 MS.draw(TV.myT);
                 TV.updateView();
                 
-            } else if(c.flags == 127 || c.flags == 65288) {
+            } else if(c.flags == 127 || c.flags == 65288) { // [delete]
                 
                 if(cpts.size()) {
                     auto p = cpts.back();
@@ -104,22 +104,22 @@ int main(int argc, char** argv) {
                     TV.updateView();
                 } else printf("No points left to delete.\n");
                 
-            } else if(c.flags == 117) {
+            } else if(c.flags == 117) { // 'u'
                 TV.unzoom();
                 MS.draw(TV.myT);
                 TV.updateView();
-            } else if(c.flags == 112) {
+            } else if(c.flags == 112) { // 'p'
                 PF.calcPerspective(cpts);
                 TV.zoomBounding(cpts);
                 TV.refresh();
                 MS.draw(TV.myT);
                 TV.updateView();
-            } else if(c.flags==114) {
+            } else if(c.flags==114) { // 'r'
                 PF.resetPerspective();
                 TV.unzoom();
                 MS.draw(TV.myT);
                 TV.updateView();
-            } else if(c.flags == 27) break;
+            } else if(c.flags == 27) break; // [esc]
             else printf("Unknown key %i\n", c.flags);
             
         } else if(c.evt == EVENT_LBUTTONDOWN) {

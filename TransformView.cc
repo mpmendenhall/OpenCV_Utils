@@ -15,27 +15,25 @@ myT(T), wname(window_name), maxSize(ws) {
     resizeWindow(wname, maxSize.width, maxSize.height);
 }
 
-void TransformView::setSource(Mat s) {
-    src = s;
-    setRegion(myT.vROI(DRect(Point(),src.size())));
-}
-
 void TransformView::setRegion(DRect vr, bool fillAspect) {
     if(fillAspect)  vr = expandAspect(vr,maxSize);
     myT.configureView(vr, src.size(), maxSize);
+    vROI = vr;
+    srcCenter = myT.v2src(0.5*(vROI.tl() + vROI.br()));
     refresh();
-}
-
-void TransformView::unzoom() {
-    setRegion(myT.vROI(DRect(Point(),src.size())));
-}
-
-void TransformView::zoomSrcRegion(Rect ROI, bool fillAspect) {
-    setRegion(myT.dst2v(ROI), fillAspect);
 }
 
 void TransformView::zoomBounding(const vector<DPoint>& srcpts, bool fillAspect) {
     vector<DPoint> vpts;
     for(auto p: srcpts) vpts.push_back(myT.src2v(p));
     setRegion(boundingRect(vpts), fillAspect);
+}
+
+void TransformView::updateTransform(txUpdateView u) {
+    if(u == VIEW_HOLD_CENTER) {
+        DPoint c0 = 0.5*(vROI.tl() + vROI.br());
+        vROI += myT.src2v(srcCenter) - c0;
+        setRegion(vROI);
+    } else if(u == VIEW_HOLD_KEY) zoomBounding(srcKey);
+    else setRegion(vROI); // default VIEW_HOLD_VROI
 }

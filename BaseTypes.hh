@@ -27,5 +27,7 @@ Size fitAspect(DSize s, Size targ);
 DRect expandAspect(DRect R, Size targ);
 /// Calculate bounding rectangle for points list
 DRect boundingRect(const vector<DPoint>& v);
+/// Get corners for rectangle
+vector<DPoint> corners(DRect R);
 
 #endif

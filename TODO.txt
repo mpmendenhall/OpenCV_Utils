@@ -3,13 +3,14 @@ Features TODO
 --- UI ---
 
 Scrollwheel zoom
+Tx change: re-center vROI; cover keypoints in srcROI, ...
+Rotation, flip control
 Filter stack interface
 Mark lines, curves
 Select, move handles
     "Live" overdrawing
 
 Instant measurement coordinates
-    perspective correction solver
 
 --- Core ---
 
@@ -17,16 +18,12 @@ Filter stacks mechanism
 
 Base image
 -> Image level filters (lens cxn, absolute-scale edgefinding, etc)
--> Zoom/perspective viewport
 -> View-level filters (color etc.)
-
-Perspective view
 
 Filters
     - Color projection
     - Histogram equalization, distortion
     - Edgefinder / derivative
-    - perspective correction
     - lens distortion correction
 Precision feature locators
     - spot finder

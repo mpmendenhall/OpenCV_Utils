@@ -21,7 +21,9 @@ public:
     /// Reverse virtual space transform
     virtual DPoint v2src(DPoint p) const = 0;
     /// Get virtual space ROI containing source ROI
-    virtual DRect vROI(DRect srcROI) const;
+    virtual DRect vROI(DRect srcROI) const { return vROI(corners(srcROI)); }
+    /// Get virtual space ROI containing source points
+    DRect vROI(vector<DPoint> srcpts) const;
     /// dst to virtual transform
     DPoint dst2v(DPoint p) const { return src2v(dst2src(p)); }
     /// dst to virtual transform
