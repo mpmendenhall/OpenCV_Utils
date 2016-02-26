@@ -6,11 +6,9 @@
 // -- Michael P. Mendenhall, 2016
 
 #include "ClickGetter.hh"
-#include "ZoomView.hh"
+#include "TransformView.hh"
+#include "ScaleFilter.hh"
 #include "MarkSet.hh"
-#include "FilterStack.hh"
-#include "VTransformFilter.hh"
-
 
 #include <stdio.h>
 #include <iostream>
@@ -41,7 +39,8 @@ int main(int argc, char** argv) {
     
     // load, display image
     Mat src = imread(imname.c_str());
-    ZoomView ZV;
+    ScaleFilter SF;
+    TransformView ZV(SF, fitAspect(src.size(), Size(1200,800)));
     ZV.setSource(src);
     ZV.updateView();
     
@@ -69,7 +68,7 @@ int main(int argc, char** argv) {
         if(c.evt == EVENT_RBUTTONUP && prevclick.evt == EVENT_RBUTTONDOWN) {
             
             ZV.zoomViewRegion(Rect(c.p, prevclick.p));
-            MS.draw(ZV);
+            MS.draw(ZV.myT);
             ZV.updateView();
             
         } else if(c.evt == EVENT_RBUTTONDOWN) {
@@ -87,7 +86,7 @@ int main(int argc, char** argv) {
                 for(auto m: MS.marks) m->setColor(CV_RGB(0,0,255));
                 cpts.clear();
                 ZV.refresh();
-                MS.draw(ZV);
+                MS.draw(ZV.myT);
                 ZV.updateView();
                 
             } else if(c.flags == 127 || c.flags == 65288) {
@@ -98,13 +97,13 @@ int main(int argc, char** argv) {
                     cpts.pop_back();
                     MS.popMark();
                     ZV.refresh();
-                    MS.draw(ZV);
+                    MS.draw(ZV.myT);
                     ZV.updateView();
                 } else printf("No points left to delete.\n");
                 
             } else if(c.flags == 117) {
                 ZV.unzoom();
-                MS.draw(ZV);
+                MS.draw(ZV.myT);
                 ZV.updateView();
             } else if(c.flags == 27) break;
             else printf("Unknown key %i\n", c.flags);
@@ -113,7 +112,7 @@ int main(int argc, char** argv) {
             auto p = ZV.srcCoords(c.p);
             cpts.push_back(p);
             printf("Adding point %i:\t%g\t%g\n", gp, p.x, p.y);
-            MS.addMark(new CircleMark(p,CV_RGB(0,255,0)), &ZV);
+            MS.addMark(new CircleMark(p,CV_RGB(0,255,0)), &ZV.myT);
             ZV.updateView();
             
         } else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);

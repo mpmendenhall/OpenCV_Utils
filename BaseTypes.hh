@@ -20,17 +20,10 @@ typedef Rect_<double> DRect;
 typedef Size_<double> DSize;
 
 /// Determine dimensions fitting within targ closest to aspect ratio of s
-inline Size fitAspect(Size s, Size targ) {
-    if(s.width*targ.height < s.height*targ.width)
-        return Size((s.width*targ.height)/s.height, targ.height);
-    else return Size(targ.width, (targ.width*s.height)/s.width);
-}
-
+Size fitAspect(Size s, Size targ);
 /// Determine dimensions fitting within targ closest to aspect ratio of s
-inline Size fitAspect(DSize s, Size targ) {
-    if(s.width*targ.height < s.height*targ.width)
-        return Size((s.width*targ.height)/s.height, targ.height);
-    else return Size(targ.width, (targ.width*s.height)/s.width);
-}
+Size fitAspect(DSize s, Size targ);
+/// Expand rectangle R to match target aspect ratio
+DRect expandAspect(DRect R, Size targ);
 
 #endif

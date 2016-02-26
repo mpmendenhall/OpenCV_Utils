@@ -8,7 +8,7 @@
 #ifndef MARKSET_HH
 #define MARKSET_HH
 
-#include "ZoomView.hh"
+#include "FilterStack.hh"
 #include <opencv2/imgproc/imgproc.hpp>
 
 /// Base class for marks/annotations to draw on image
@@ -20,8 +20,8 @@ public:
     virtual ~ImageMark() {}
     /// Set mark color
     virtual void setColor(const Scalar& mc) { color = mc; }
-    /// Draw to image
-    virtual void draw(ZoomView& ZV) const = 0;
+    /// Draw to transform filter destination image
+    virtual void draw(FilterLayer& FL) const = 0;
     
     Scalar color;       ///< draw color
 };
@@ -32,10 +32,7 @@ public:
     /// Constructor
     CircleMark(DPoint p, const Scalar& cl, int r0 = 4, int t0 = 1): c(p), r(r0), t(t0) { setColor(cl); }  
     /// Draw to image
-    void draw(ZoomView& ZV) const override {
-        Point p = ZV.viewCoords(c);
-        circle(ZV.iview, p, r, color, t, CV_AA);
-    }
+    void draw(FilterLayer& FL) const override { circle(FL.dst, FL.src2dst(c), r, color, t, CV_AA); }
     
     DPoint c;           ///< center
     int r;              ///< radius
@@ -50,12 +47,12 @@ public:
     /// Destructor
     ~MarkSet() { for(auto m: marks) delete m; }
     /// Add a mark (takes ownership)
-    void addMark(ImageMark* m, ZoomView* ZV = NULL) { if(m) { marks.push_back(m); if(ZV) m->draw(*ZV); } }
+    void addMark(ImageMark* m, FilterLayer* FL = NULL) { if(m) { marks.push_back(m); if(FL) m->draw(*FL); } }
     /// Pop mark from list; delete
     void popMark() { if(marks.size()) { delete marks.back(); marks.pop_back(); } }
     
-    /// Draw to image
-    void draw(ZoomView& ZV) const { for(auto m: marks) m->draw(ZV); }
+    /// Draw to transform filter destination image
+    void draw(FilterLayer& FL) const { for(auto m: marks) m->draw(FL); }
     
     vector<ImageMark*> marks;
 };

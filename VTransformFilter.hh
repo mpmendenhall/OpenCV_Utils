@@ -24,6 +24,8 @@ public:
     virtual DRect vROI(DRect srcROI) const;
     /// dst to virtual transform
     DPoint dst2v(DPoint p) const { return src2v(dst2src(p)); }
+    /// dst to virtual transform
+    DRect dst2v(DRect R) const { return DRect(dst2v(R.tl()), dst2v(R.br())); }
     /// virtual to dst transform
     DPoint v2dst(DPoint p) const { return src2dst(v2src(p)); }
     
