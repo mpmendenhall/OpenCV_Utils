@@ -15,12 +15,6 @@ ZoomView::ZoomView(const char* window_name): wname(window_name) {
     resizeWindow(wname, targetSize.width, targetSize.height);
 }
 
-Size ZoomView::fitAspect(Size s, Size targ) {
-    if(s.width*targ.height < s.height*targ.width)
-        return Size((s.width*targ.height)/s.height, targ.height);
-    else return Size(targ.width, (targ.width*s.height)/s.width);
-}
-
 void ZoomView::expandAspect(DPoint& p0, DPoint& p1) const {
     double dx = fabs(p1.x-p0.x);
     double dy = fabs(p1.y-p0.y);

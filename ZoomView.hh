@@ -8,19 +8,8 @@
 #ifndef ZOOMVIEW_HH
 #define ZOOMVIEW_HH
 
+#include "BaseTypes.hh"
 #include "ClickGetter.hh"
-#include <opencv2/highgui/highgui.hpp>
-#include <array>
-using std::array;
-using namespace std;
-using namespace cv;
-
-struct DPoint {
-    DPoint(double xx = 0, double yy = 0): x(xx), y(yy) { }
-    double x;
-    double y;
-};
-
 
 /// Interactive "zoomable" image viewport
 class ZoomView {
@@ -38,8 +27,6 @@ public:
     /// refresh zoom image, clearing any over-drawing
     void refresh() { setRegion(rregion); }
     
-    /// fit aspect ratio within maximum; optionally, expand to include all
-    static Size fitAspect(Size s, Size targ);
     /// expand bounding box to fit window aspect ratio
     void expandAspect(DPoint& p0, DPoint& p1) const;
     

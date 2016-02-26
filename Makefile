@@ -25,7 +25,7 @@ LDFLAGS += -L. -lOCVUtils `pkg-config --libs opencv`
 
 VPATH = ./:
 
-objects = ClickGetter.o ZoomView.o
+objects = ClickGetter.o ScaleFilter.o VTransformFilter.o ZoomView.o
 execs = OCV_Test CollectPoints
 all: libOCVUtils.a libOCVUtils.so $(execs)
 

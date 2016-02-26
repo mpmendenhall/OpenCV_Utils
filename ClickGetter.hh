@@ -8,11 +8,9 @@
 #ifndef CLICKGETTER_HH
 #define CLICKGETTER_HH
 
-#include <vector>
+#include "BaseTypes.hh"
 #include <set>
-#include <opencv2/highgui/highgui.hpp>
-using namespace std;
-using namespace cv;
+using std::set;
 
 /// Receives click positions in window
 class ClickGetter {

@@ -8,6 +8,9 @@
 #include "ClickGetter.hh"
 #include "ZoomView.hh"
 #include "MarkSet.hh"
+#include "FilterStack.hh"
+#include "VTransformFilter.hh"
+
 
 #include <stdio.h>
 #include <iostream>
@@ -22,16 +25,19 @@ using std::string;
 
 using namespace std;
 using namespace cv;
-    
+
+string dropLast(const string& str, const string& splitchars) {
+    return str.substr(0, str.find_last_of(splitchars));
+}
+
 int main(int argc, char** argv) {
     
-    if(argc != 2) {
-        printf("Usage: CollectPoints <image name>\n");
+    if(argc < 2 || argc > 3) {
+        printf("Usage: CollectPoints <image name> [output filename]\n");
         return EXIT_FAILURE;
     }
     string imname = argv[1];
-    
-    string outnm = imname+"_points.txt";
+    string outnm = argc==3? argv[2] : dropLast(imname,".")+"_points.txt";
     
     // load, display image
     Mat src = imread(imname.c_str());
@@ -116,7 +122,7 @@ int main(int argc, char** argv) {
     }
     if(cpts.size()) printf("Saving group %i with %zu points.\n", gp, cpts.size());
     for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);
-    printf("Done!\n");
+    printf("Points output to '%s'.\n", outnm.c_str());
     fclose(fout);
     
     return EXIT_SUCCESS;

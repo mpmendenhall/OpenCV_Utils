@@ -14,6 +14,14 @@ Instant measurement coordinates
 --- Core ---
 
 Filter stacks mechanism
+
+Base image
+-> Image level filters (lens cxn, absolute-scale edgefinding, etc)
+-> Zoom/perspective viewport
+-> View-level filters (color etc.)
+
+Perspective view
+
 Filters
     - Color projection
     - Histogram equalization, distortion

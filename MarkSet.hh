@@ -10,9 +10,6 @@
 
 #include "ZoomView.hh"
 #include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <vector>
-using std::vector;
 
 /// Base class for marks/annotations to draw on image
 class ImageMark {
