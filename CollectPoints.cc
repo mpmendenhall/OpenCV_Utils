@@ -8,6 +8,7 @@
 #include "ClickGetter.hh"
 #include "TransformView.hh"
 #include "ScaleFilter.hh"
+#include "PerspectiveFilter.hh"
 #include "MarkSet.hh"
 
 #include <stdio.h>
@@ -39,10 +40,12 @@ int main(int argc, char** argv) {
     
     // load, display image
     Mat src = imread(imname.c_str());
-    ScaleFilter SF;
-    TransformView ZV(SF, fitAspect(src.size(), Size(1200,800)));
-    ZV.setSource(src);
-    ZV.updateView();
+    //ScaleFilter SF;
+    PerspectiveFilter PF;
+    //SF.vsc = DPoint(3,2);
+    TransformView TV(PF, fitAspect(src.size(), Size(1200,800)));
+    TV.setSource(src);
+    TV.updateView();
     
     // show instructions
     printf("Point selection commands:\n");
@@ -60,16 +63,16 @@ int main(int argc, char** argv) {
     vector<DPoint> cpts;                // points in current group
     MarkSet MS;                         // image display annotations
     
-    ZV.myCG.accept = { EVENT_LBUTTONDOWN, EVENT_RBUTTONDOWN, EVENT_RBUTTONUP, ClickGetter::EVENT_KEYBOARD };
+    TV.myCG.accept = { EVENT_LBUTTONDOWN, EVENT_RBUTTONDOWN, EVENT_RBUTTONUP, ClickGetter::EVENT_KEYBOARD };
     ClickGetter::click prevclick; // previous mouse-down location
     while(1) {
-        auto c = ZV.myCG.getClick();
+        auto c = TV.myCG.getClick();
         
         if(c.evt == EVENT_RBUTTONUP && prevclick.evt == EVENT_RBUTTONDOWN) {
             
-            ZV.zoomViewRegion(Rect(c.p, prevclick.p));
-            MS.draw(ZV.myT);
-            ZV.updateView();
+            TV.zoomSrcRegion(Rect(c.p, prevclick.p));
+            MS.draw(TV.myT);
+            TV.updateView();
             
         } else if(c.evt == EVENT_RBUTTONDOWN) {
             
@@ -85,9 +88,9 @@ int main(int argc, char** argv) {
                 
                 for(auto m: MS.marks) m->setColor(CV_RGB(0,0,255));
                 cpts.clear();
-                ZV.refresh();
-                MS.draw(ZV.myT);
-                ZV.updateView();
+                TV.refresh();
+                MS.draw(TV.myT);
+                TV.updateView();
                 
             } else if(c.flags == 127 || c.flags == 65288) {
                 
@@ -96,24 +99,35 @@ int main(int argc, char** argv) {
                     printf("Deleting point %i:\t%g\t%g\n", gp, p.x, p.y);
                     cpts.pop_back();
                     MS.popMark();
-                    ZV.refresh();
-                    MS.draw(ZV.myT);
-                    ZV.updateView();
+                    TV.refresh();
+                    MS.draw(TV.myT);
+                    TV.updateView();
                 } else printf("No points left to delete.\n");
                 
             } else if(c.flags == 117) {
-                ZV.unzoom();
-                MS.draw(ZV.myT);
-                ZV.updateView();
+                TV.unzoom();
+                MS.draw(TV.myT);
+                TV.updateView();
+            } else if(c.flags == 112) {
+                PF.calcPerspective(cpts);
+                TV.zoomBounding(cpts);
+                TV.refresh();
+                MS.draw(TV.myT);
+                TV.updateView();
+            } else if(c.flags==114) {
+                PF.resetPerspective();
+                TV.unzoom();
+                MS.draw(TV.myT);
+                TV.updateView();
             } else if(c.flags == 27) break;
             else printf("Unknown key %i\n", c.flags);
             
         } else if(c.evt == EVENT_LBUTTONDOWN) {
-            auto p = ZV.srcCoords(c.p);
+            auto p = TV.srcCoords(c.p);
             cpts.push_back(p);
             printf("Adding point %i:\t%g\t%g\n", gp, p.x, p.y);
-            MS.addMark(new CircleMark(p,CV_RGB(0,255,0)), &ZV.myT);
-            ZV.updateView();
+            MS.addMark(new CircleMark(p,CV_RGB(0,255,0)), &TV.myT);
+            TV.updateView();
             
         } else printf("unknown event: %i:%i\t%i, %i\n", c.evt, c.flags, c.p.x, c.p.y);
         

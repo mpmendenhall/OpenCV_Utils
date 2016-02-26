@@ -25,5 +25,7 @@ Size fitAspect(Size s, Size targ);
 Size fitAspect(DSize s, Size targ);
 /// Expand rectangle R to match target aspect ratio
 DRect expandAspect(DRect R, Size targ);
+/// Calculate bounding rectangle for points list
+DRect boundingRect(const vector<DPoint>& v);
 
 #endif

@@ -6,6 +6,7 @@
 // -- Michael P. Mendenhall, 2016
 
 #include "BaseTypes.hh"
+using std::min;
 
 Size fitAspect(Size s, Size targ) {
     if(s.width*targ.height < s.height*targ.width)
@@ -32,6 +33,19 @@ DRect expandAspect(DRect R, Size targ) {
         double hh = 0.5*targ.height*R.width/targ.width;
         p0.y = y0 - hh;
         p1.y = y0 + hh;
+    }
+    return DRect(p0,p1);
+}
+
+DRect boundingRect(const vector<DPoint>& v) {
+    if(!v.size()) return DRect();
+    DPoint p0(v[0]);
+    DPoint p1(v[1]);
+    for(auto p: v) {
+        p0.x = min(p0.x,p.x);
+        p0.y = min(p0.y,p.y);
+        p1.x = max(p1.x,p.x);
+        p1.y = max(p1.y,p.y);
     }
     return DRect(p0,p1);
 }

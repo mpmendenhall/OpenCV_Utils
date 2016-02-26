@@ -19,8 +19,8 @@ public:
 
     /// set source image
     void setSource(Mat s);
-    /// generate view image for virtual space region
-    void setRegion(DRect vr);
+    /// generate view image for virtual space region (optionally expanding to preserve aspect ratio)
+    void setRegion(DRect vr, bool fillAspect = true);
     
     /// update display
     void updateView() { imshow(wname, myT.dst); }
@@ -33,9 +33,11 @@ public:
     Point viewCoords(DPoint p) const { return myT.src2dst(p); }
     
     /// zoom to region defined by current view pixel coordinates
-    void zoomViewRegion(Rect ROI, bool fillAspect = true);
+    void zoomSrcRegion(Rect ROI, bool fillAspect = true);
+    /// zoom to region containing source image points
+    void zoomBounding(const vector<DPoint>& srcpts, bool fillAspect = true);
     /// reset to full-image view
-    void unzoom() { setSource(src); }
+    void unzoom();
     
     VTransformFilter& myT;      ///< transform filter
     const char* wname;          ///< name of window

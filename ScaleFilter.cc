@@ -14,7 +14,7 @@ void ScaleFilter::apply(const Mat& src) {
     
 void ScaleFilter::configureView(DRect vROI, Size sIn, Size sOut) {
     srcSize = sIn;
-    srcROI = v2src(vROI); // rounded source ROI
+    srcROI = v2src(vROI); // integer-rounded source ROI
     srcROI &= Rect(Point(0,0), srcSize); // clip to exist within source
     // force minimum 1x1 pixel size
     srcROI.width = max(1,srcROI.width);

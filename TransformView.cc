@@ -20,13 +20,22 @@ void TransformView::setSource(Mat s) {
     setRegion(myT.vROI(DRect(Point(),src.size())));
 }
 
-void TransformView::setRegion(DRect vr) {
+void TransformView::setRegion(DRect vr, bool fillAspect) {
+    if(fillAspect)  vr = expandAspect(vr,maxSize);
     myT.configureView(vr, src.size(), maxSize);
     refresh();
 }
 
-void TransformView::zoomViewRegion(Rect ROI, bool fillAspect) {
-    DRect vr(myT.dst2v(ROI));
-    if(fillAspect) vr = expandAspect(vr,maxSize);
-    setRegion(vr);
+void TransformView::unzoom() {
+    setRegion(myT.vROI(DRect(Point(),src.size())));
+}
+
+void TransformView::zoomSrcRegion(Rect ROI, bool fillAspect) {
+    setRegion(myT.dst2v(ROI), fillAspect);
+}
+
+void TransformView::zoomBounding(const vector<DPoint>& srcpts, bool fillAspect) {
+    vector<DPoint> vpts;
+    for(auto p: srcpts) vpts.push_back(myT.src2v(p));
+    setRegion(boundingRect(vpts), fillAspect);
 }

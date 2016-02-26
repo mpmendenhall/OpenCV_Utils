@@ -9,11 +9,13 @@
 using std::min;
     
 DRect VTransformFilter::vROI(DRect srcROI) const {
-    DPoint c0 = src2v(srcROI.tl());
-    DPoint c1 = src2v(srcROI.br());
-    DPoint c2(c0.x,c1.y);
-    DPoint c3(c1.x,c0.y);
     
-    return DRect(DPoint(min(c0.x, min(c1.x, min(c2.x, c3.x))), min(c0.y, min(c1.y, min(c2.y, c3.y)))),
-                 DPoint(max(c0.x, max(c1.x, max(c2.x, c3.x))), max(c0.y, max(c1.y, max(c2.y, c3.y)))));
+    DPoint c0 = srcROI.tl();
+    DPoint c1 = srcROI.br();
+    DPoint c2 = DPoint(c0.x,c1.y);
+    DPoint c3 = DPoint(c1.x,c0.y);
+    vector<DPoint> bpts = { c0, c1, c2, c3 };
+    for(auto& p: bpts) p = src2v(p);
+    
+    return boundingRect(bpts);
 }
