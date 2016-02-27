@@ -43,7 +43,7 @@ public:
     /// Forward position transform
     DPoint src2dst(DPoint p) const override { for(auto l: layers) p = l->src2dst(p); return p; }
     /// Backwards position transform
-    DPoint dst2src(DPoint p) const { for(auto it = layers.rbegin(); it != layers.rend(); it++) (*it)->dst2src(p); return p; }
+    DPoint dst2src(DPoint p) const override { for(auto it = layers.rbegin(); it != layers.rend(); it++) p = (*it)->dst2src(p); return p; }
     
     vector<FilterLayer*> layers;
 };
