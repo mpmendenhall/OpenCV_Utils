@@ -83,7 +83,10 @@ int main(int argc, char** argv) {
             if(c.flags == 10 || c.flags == 13) { // [enter]
                 
                 printf("Saving group %i with %zu points.\n", gp, cpts.size());
-                for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);
+                for(auto& p: cpts) {
+                    auto pV = TV.myT.src2v(p);
+                    fprintf(fout, "%i\t%g\t%g\t%g\t%g\n", gp, p.x, p.y, pV.x, pV.y);
+                }
                 gp++;
                 
                 for(auto m: MS.marks) m->setColor(CV_RGB(0,0,255));
@@ -134,7 +137,10 @@ int main(int argc, char** argv) {
         prevclick = c;
     }
     if(cpts.size()) printf("Saving group %i with %zu points.\n", gp, cpts.size());
-    for(auto& p: cpts) fprintf(fout, "%i\t%g\t%g\n", gp, p.x, p.y);
+    for(auto& p: cpts) {
+        auto pV = TV.myT.src2v(p);
+        fprintf(fout, "%i\t%g\t%g\t%g\t%g\n", gp, p.x, p.y, pV.x, pV.y);
+    }
     printf("Points output to '%s'.\n", outnm.c_str());
     fclose(fout);
     
