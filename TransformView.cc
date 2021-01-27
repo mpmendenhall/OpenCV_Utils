@@ -10,7 +10,7 @@
 
 TransformView::TransformView(VTransformFilter& T, Size ws, const char* window_name):
 myT(T), wname(window_name), maxSize(ws) { 
-    namedWindow(wname, WINDOW_AUTOSIZE | CV_WINDOW_KEEPRATIO | CV_GUI_EXPANDED);
+    namedWindow(wname, WINDOW_AUTOSIZE | WINDOW_KEEPRATIO | WINDOW_GUI_EXPANDED);
     setMouseCallback(wname, clickGetterCallback, &myCG);
     resizeWindow(wname, maxSize.width, maxSize.height);
 }

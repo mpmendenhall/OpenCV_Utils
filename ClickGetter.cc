@@ -2,7 +2,7 @@
 // This file was produced under the employ of the United States Government,
 // and is consequently in the PUBLIC DOMAIN, free from all provisions of
 // US Copyright Law (per USC Title 17, Section 105).
-// 
+//
 // -- Michael P. Mendenhall, 2015
 
 #include "ClickGetter.hh"
@@ -28,6 +28,10 @@ ClickGetter::click ClickGetter::getClick() {
             clicks.push_back(c);
         }
     }
+    if(verbose) {
+        auto& c = clicks.back();
+        printf("Click event [%i] at %i,%i\n", k, c.p.x, c.p.y);
+    }
     return clicks.back();
 }
 
@@ -42,27 +46,24 @@ Rect ClickGetter::getRectangle(bool twoclick) {
     return Rect(clicks[0].p, clicks[1].p);
 }
 
-Mat ClickGetter::getSubregion(Mat& src, double scale, bool twoclick) {
-    clicks.clear();
-    if(twoclick) accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN };
-    else accept = { EVENT_LBUTTONUP, EVENT_LBUTTONDOWN };
-    getClick();
-    getClick();
-    Rect rregion = getRectangle(twoclick);
+Rect ClickGetter::getRectangle(Mat& src, double scale, bool twoclick) {
+    auto rregion = getRectangle(twoclick);
     rregion.x *= scale;
     rregion.y *= scale;
     rregion.width *= scale;
     rregion.height *= scale;
     rregion &= Rect(0,0,src.cols,src.rows);
-    //cout << clicks[0].p << "\t" << clicks[1].p << "\t" << rregion << "\n";
-    return src(rregion);
+    return rregion;
+}
+
+Mat ClickGetter::getSubregion(Mat& src, double scale, bool twoclick) {
+    return src(getRectangle(src, scale, twoclick));
 }
 
 void clickGetterCallback(int event, int x, int y, int flags, void* params) {
-    assert(params);
-    ClickGetter* CG = (ClickGetter*)params;
+    auto CG = (ClickGetter*)params;
     if(CG->received) return;
-    if (event == EVENT_MOUSEMOVE) CG->mousepos = Point(x,y);
+    if(event == EVENT_MOUSEMOVE) CG->mousepos = Point(x,y);
     if(CG->accept.count(event)) {
         ClickGetter::click c;
         c.p = Point(x,y);

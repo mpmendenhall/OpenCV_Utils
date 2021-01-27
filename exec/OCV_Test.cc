@@ -28,7 +28,7 @@ using namespace cv;
 // load blue channel, downsampled in 3x3 block sums
 Mat_<float> load_blue_downsampled(const string& fname) {
     cout << "Loading file...\n";
-    Mat src = imread(fname.c_str(), CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_GRAYSCALE);
+    Mat src = imread(fname.c_str(), IMREAD_ANYDEPTH | IMREAD_GRAYSCALE);
     cout << "Loaded data of type " << src.type() << "\n";
     
     // downsampled floating point image; scale to display nicely.
@@ -57,7 +57,7 @@ Mat_<float> load_darkframed(const string& fLight, const string& fDark = "") {
 int main(int, char**) {
     // display window with mouse click tracking
     const char* window_name = "OpenCV image";
-    namedWindow(window_name, CV_WINDOW_AUTOSIZE );
+    namedWindow(window_name, WINDOW_AUTOSIZE);
     ClickGetter CG;
     setMouseCallback(window_name, clickGetterCallback, &CG);
     
@@ -131,7 +131,7 @@ int main(int, char**) {
     Mat subregion = resamp(sumslice);
     bool yproject = false;
     Mat colSum;
-    reduce(subregion, colSum, yproject, CV_REDUCE_AVG);
+    reduce(subregion, colSum, yproject, REDUCE_AVG);
     
     // output average slice to file
     string outname = basedir+fSample+"_slice.txt";

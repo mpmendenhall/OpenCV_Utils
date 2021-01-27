@@ -1,0 +1,6 @@
+file(GLOB EXECS *.cc)
+foreach(E ${EXECS})
+get_filename_component(EXN ${E} NAME_WE)
+add_executable(${EXN} ${E})
+target_link_libraries(${EXN} OCVU ${EXTLIBS})
+endforeach(E)

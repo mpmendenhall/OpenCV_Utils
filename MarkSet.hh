@@ -32,7 +32,7 @@ public:
     /// Constructor
     CircleMark(DPoint p, const Scalar& cl, int r0 = 4, int t0 = 1): c(p), r(r0), t(t0) { setColor(cl); }  
     /// Draw to image
-    void draw(FilterLayer& FL) const override { circle(FL.dst, FL.src2dst(c), r, color, t, CV_AA); }
+    void draw(FilterLayer& FL) const override { circle(FL.dst, FL.src2dst(c), r, color, t, cv::LINE_AA); }
     
     DPoint c;           ///< center
     int r;              ///< radius
