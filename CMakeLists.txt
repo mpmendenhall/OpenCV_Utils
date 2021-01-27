@@ -20,17 +20,26 @@ include(DefaultBuildType.cmake)
 # dependencies
 ##############
 
-# sudo apt install libopencv-dev
+# sudo apt install libopencv-dev libraw-dev
 
 find_package(OpenCV REQUIRED)
 include_directories(SYSTEM ${OpenCV_INCLUDE_DIRS})
 LIST(APPEND EXTLIBS ${OpenCV_LIBS})
 
+LIST(APPEND SRCDIRS core)
+
+find_library(LIBRAW raw)
+if(LIBRAW)
+    LIST(APPEND EXTLIBS ${LIBRAW})
+    LIST(APPEND CXXOPTS "-DWITH_LIBRAW")
+    LIST(APPEND SRCDIRS raw)
+endif()
+
 ##############
 # source files
 ##############
 
-foreach(dir IN ITEMS .)
+foreach(dir IN ITEMS ${SRCDIRS})
     include_directories(${dir})
     file(GLOB DIRSRC ${dir}/*.c*)
     LIST(APPEND SOURCE_FILES ${DIRSRC})
@@ -52,7 +61,7 @@ include(CXXWarnings.cmake)
 INCLUDE(GitRepoTag.cmake)
 SET_SOURCE_FILES_PROPERTIES(CodeVersion.cc PROPERTIES COMPILE_FLAGS ${CODEVERSION_COMPILE_FLAGS})
 # force rebuild of CodeVersion
-add_custom_command(OUTPUT codeversion COMMAND touch ${PROJECT_SOURCE_DIR}/CodeVersion.cc)
+add_custom_command(OUTPUT codeversion COMMAND touch ${PROJECT_SOURCE_DIR}/core/CodeVersion.cc)
 add_custom_target(update_codeversion DEPENDS codeversion)
 
 ###############
