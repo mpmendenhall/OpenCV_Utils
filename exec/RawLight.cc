@@ -2,9 +2,8 @@
 // - Michael P. Mendenhall, 2021
 
 /*
-export IMDAT=../Presentations/2021-01-25_XTalk/BoxScreen
-export IMDAT=../Presentations/2021-01-25_XTalk/MiddleOut
-./bin/SumLight ${IMDAT}_On.NEF ${IMDAT}_BG.NEF
+export IMDAT=$HOME/Work/PROSPECT/Presentations/2021-01-25_XTalk/
+./bin/RawLight ${IMDAT}/P2_lift_1_mm.NEF ${IMDAT}/P2_lift_BG.NEF
 */
 
 #ifdef WITH_LIBRAW
@@ -47,11 +46,11 @@ int main(int argc, char** argv) {
     double maxVal;
     cv::Point minLoc;
     cv::Point maxLoc;
-    minMaxLoc( DatImg, &minVal, &maxVal, &minLoc, &maxLoc );
+    minMaxLoc(DatImg, &minVal, &maxVal, &minLoc, &maxLoc);
     printf("Raw image range %g -- %g\n", minVal, maxVal);
 
     // subtract darkframe
-    QL -= QD;
+    DatImg -= BGImg;
 
     // preview image (normalized, nonlinear boosted brightness)
     auto ViewImg = DatImg.clone();

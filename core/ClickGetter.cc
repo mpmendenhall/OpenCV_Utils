@@ -10,9 +10,8 @@
 
 const int ClickGetter::EVENT_KEYBOARD = 999;
 
-ClickGetter::ClickGetter(): received(true) {
-    accept = { EVENT_LBUTTONUP, EVENT_RBUTTONDOWN };
-}
+ClickGetter::ClickGetter(): received(true),
+accept({ EVENT_LBUTTONUP, EVENT_RBUTTONDOWN }) { }
 
 ClickGetter::click ClickGetter::getClick() {
     received = false;
@@ -61,7 +60,7 @@ Mat ClickGetter::getSubregion(Mat& src, double scale, bool twoclick) {
 }
 
 void clickGetterCallback(int event, int x, int y, int flags, void* params) {
-    auto CG = (ClickGetter*)params;
+    auto CG = static_cast<ClickGetter*>(params);
     if(CG->received) return;
     if(event == EVENT_MOUSEMOVE) CG->mousepos = Point(x,y);
     if(CG->accept.count(event)) {

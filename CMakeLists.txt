@@ -59,10 +59,7 @@ include(CXXWarnings.cmake)
 #############
 
 INCLUDE(GitRepoTag.cmake)
-SET_SOURCE_FILES_PROPERTIES(CodeVersion.cc PROPERTIES COMPILE_FLAGS ${CODEVERSION_COMPILE_FLAGS})
-# force rebuild of CodeVersion
-add_custom_command(OUTPUT codeversion COMMAND touch ${PROJECT_SOURCE_DIR}/core/CodeVersion.cc)
-add_custom_target(update_codeversion DEPENDS codeversion)
+SET_SOURCE_FILES_PROPERTIES(core/CodeVersion.cc PROPERTIES COMPILE_DEFINITIONS "${CODEVERSION_COMPILE_DEFS}")
 
 ###############
 # Finalize compile flags
@@ -86,7 +83,15 @@ endforeach(l)
 
 add_library(OCVU SHARED ${SOURCE_FILES})
 target_link_libraries(OCVU ${EXTLIBS})
-add_dependencies(OCVU update_codeversion)
 
 add_subdirectory(exec)
+
+# run "cppcheck" static code analysis on project
+if(CMAKE_EXPORT_COMPILE_COMMANDS)
+    add_custom_target(cppcheck
+        cppcheck --project=compile_commands.json --enable=all --quiet --suppress=missingIncludeSystem --suppress=useStlAlgorithm
+            -i ${CMAKE_BINARY_DIR}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+endif()
 

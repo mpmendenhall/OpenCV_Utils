@@ -11,7 +11,7 @@
 class QuadLayers {
 public:
     /// Constructor
-    QuadLayers(LibRaw& I);
+    explicit QuadLayers(LibRaw& I);
 
     /// Darkframe subtraction
     void operator-=(const QuadLayers& QL);
